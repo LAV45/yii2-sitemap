@@ -8,7 +8,8 @@ use yii\base\ErrorException;
 use xj\sitemap\models\Url;
 use xj\sitemap\formaters\UrlsetResponseFormatter;
 
-class SitemapUrlsetAction extends Action {
+class SitemapUrlsetAction extends Action
+{
 
     /**
      * dataProvider
@@ -24,7 +25,7 @@ class SitemapUrlsetAction extends Action {
 
     /**
      * Remap Data to Url
-     * @var Closure | []
+     * @var \Closure|array
      */
     public $remap;
 
@@ -34,7 +35,9 @@ class SitemapUrlsetAction extends Action {
      */
     public $gzip = false;
 
-    public function init() {
+    public function init()
+    {
+        parent::init();
 
         if (is_array($this->remap)) {
             $this->isClosure = false;
@@ -46,13 +49,11 @@ class SitemapUrlsetAction extends Action {
 
         //init dataProvider
         $this->dataProvider->prepare();
-
-        return parent::init();
     }
 
     /**
      * execute run()
-     * @return []Url
+     * @return Url[]
      */
     public function run() {
         //setFormat
@@ -74,16 +75,15 @@ class SitemapUrlsetAction extends Action {
 
     /**
      * getFromDataProvider
-     * @return []Url
+     * @return Url[]
      */
-    private function getFromDataProvider() {
+    private function getFromDataProvider()
+    {
         $remap = $this->remap;
         $models = $this->dataProvider->getModels();
         $oModels = [];
         foreach ($models as $model) {
             if ($this->isClosure) {
-                //function($model)
-                //return Url
                 $oModels[] = call_user_func($remap, $model);
             } else {
                 $oModels[] = $this->remapModel($model, $this->remap);
@@ -94,16 +94,15 @@ class SitemapUrlsetAction extends Action {
 
     /**
      * SourceModel Remap to SitemapModel
-     * @param Model $model SourceModel
-     * @param [] $remap Remap Table
-     * @reutrn Url
+     * @param \yii\base\Model $model SourceModel
+     * @param array $remap Remap Table
+     * @return Url
      */
-    private function remapModel($model, $remap) {
+    private function remapModel($model, $remap)
+    {
         $oModel = new Url();
         foreach ($remap as $dst => $src) {
             if (is_callable($src)) {
-                //function($model)
-                //return xj\sitemap\models\Sitemap
                 $oModel->$dst = call_user_func($src, $model);
             } else {
                 $oModel->$dst = $model->$src;
